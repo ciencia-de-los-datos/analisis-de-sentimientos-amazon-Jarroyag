@@ -30,14 +30,14 @@ def pregunta_01():
     )
 
     # Separe los grupos de mensajes etiquetados y no etiquetados.
-    df_tagged = df[(df["lbl"]>=0)]
-    df_untagged = df[(df["lbl"].isna())]
+    df_tagged = df.loc[df["lbl"].notna()]
+    df_untagged = df.loc[df["lbl"].isna()]
 
     x_tagged = df_tagged["msg"]
     y_tagged = df_tagged["lbl"]
 
     x_untagged = df_untagged["msg"]
-    y_untagged = df_untagged["lsb"]
+    y_untagged = df_untagged["lbl"]
 
     # Retorne los grupos de mensajes
     return x_tagged, y_tagged, x_untagged, y_untagged
@@ -61,7 +61,7 @@ def pregunta_02():
         x_tagged,
         y_tagged,
         test_size=0.1,
-        random_state=12345
+        random_state=12345,
     )
 
     # Retorne `X_train`, `X_test`, `y_train` y `y_test`
@@ -80,10 +80,10 @@ def pregunta_03():
 
     # Cree un stemeer que use el algoritmo de Porter.
     stemmer = PorterStemmer()
-    vectorizer= CountVectorizer(analyzer="word",token_pattern=r"(?u)\b[a-zA-Z][a-zA-Z]+\b", lowercase=True)
+    #vectorizer= CountVectorizer(analyzer="word",token_pattern=r"(?u)\b[a-zA-Z][a-zA-Z]+\b", lowercase=True)
 
     # Cree una instancia del analizador de palabras (build_analyzer)
-    analyzer = vectorizer.build_analyzer()
+    analyzer = CountVectorizer().build_analyzer()
 
     # Retorne el analizador de palabras
     return lambda x: (stemmer.stem(w) for w in analyzer(x))
@@ -115,20 +115,30 @@ def pregunta_04():
     # límite superior para la frecuencia de palabras es del 100% y un límite
     # inferior de 5 palabras. Solo deben analizarse palabras conformadas por
     # letras.
-    countVectorizer = CountVectorizer(analyzer=analyzer,lowercase=True,stop_words="english",
-    token_pattern=r"(?u)\b[a-zA-Z][a-zA-Z]+\b", binary=True, max_df=1.0, min_df=5)
+     countVectorizer = CountVectorizer(
+        analyzer=analyzer,
+        lowercase=True,
+        stop_words="english",
+        token_pattern=r"(?u)\b[a-zA-Z][a-zA-Z]+\b",
+        binary=True,
+        max_df=1.0,
+        min_df=5,
+    )
 
     # Cree un pipeline que contenga el CountVectorizer y el modelo de BernoulliNB.
-    pipeline = Pipeline(steps=[
-        ("countVectorizer", countVectorizer),
-        ("bernoulli", BernoulliNB()),
+    pipeline = Pipeline(
+        steps=[
+            ("countVectorizer", countVectorizer),
+            ("bernoulli", BernoulliNB()),
         ],
     )
 
     # Defina un diccionario de parámetros para el GridSearchCV. Se deben
     # considerar 10 valores entre 0.1 y 1.0 para el parámetro alpha de
     # BernoulliNB.
-    param_grid = {"bernoulli__alpha": np.arange(0.1,1.01, 0.1),}
+    param_grid = {
+        "bernoulli__alpha": np.arange(0.1,1.01, 0.1),
+    }
 
     # Defina una instancia de GridSearchCV con el pipeline y el diccionario de
     # parámetros. Use cv = 5, y "accuracy" como métrica de evaluación
@@ -188,11 +198,11 @@ def pregunta_06():
     gridSearchCV = pregunta_04()
 
     # Cargue los datos generados en la pregunta 01.
-    x_tagged, y_tagged, x_untagged, y_untagged  = pregunta_01()
+    X_tagged, y_tagged, X_untagged, y_untagged = pregunta_01()
 
     # pronostique la polaridad del sentimiento para los datos
     # no etiquetados
-    y_untagged_pred = gridSearchCV.predict(x_untagged)
+    y_untagged_pred = gridSearchCV.predict(X_untagged)
 
     # Retorne el vector de predicciones
     return y_untagged_pred
