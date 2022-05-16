@@ -12,7 +12,6 @@ import numpy as np
 import pandas as pd
 
 
-
 def pregunta_01():
     """
     Carga de datos.
@@ -26,7 +25,7 @@ def pregunta_01():
         "amazon_cells_labelled.tsv",
         sep="\t",
         header=None,
-        names=["msg","lbl"]
+        names=["msg","lbl"],
     )
 
     # Separe los grupos de mensajes etiquetados y no etiquetados.
@@ -75,12 +74,11 @@ def pregunta_03():
     """
     # Importe el stemmer de Porter
     # Importe CountVectorizer
-    from sklearn.feature_extraction.text import CountVectorizer
     from nltk.stem.porter import PorterStemmer
+    from sklearn.feature_extraction.text import CountVectorizer
 
     # Cree un stemeer que use el algoritmo de Porter.
     stemmer = PorterStemmer()
-    #vectorizer= CountVectorizer(analyzer="word",token_pattern=r"(?u)\b[a-zA-Z][a-zA-Z]+\b", lowercase=True)
 
     # Cree una instancia del analizador de palabras (build_analyzer)
     analyzer = CountVectorizer().build_analyzer()
@@ -115,7 +113,7 @@ def pregunta_04():
     # límite superior para la frecuencia de palabras es del 100% y un límite
     # inferior de 5 palabras. Solo deben analizarse palabras conformadas por
     # letras.
-     countVectorizer = CountVectorizer(
+    countVectorizer = CountVectorizer(
         analyzer=analyzer,
         lowercase=True,
         stop_words="english",
@@ -128,7 +126,7 @@ def pregunta_04():
     # Cree un pipeline que contenga el CountVectorizer y el modelo de BernoulliNB.
     pipeline = Pipeline(
         steps=[
-            ("countVectorizer", countVectorizer),
+            ("vector", countVectorizer),
             ("bernoulli", BernoulliNB()),
         ],
     )
@@ -137,7 +135,7 @@ def pregunta_04():
     # considerar 10 valores entre 0.1 y 1.0 para el parámetro alpha de
     # BernoulliNB.
     param_grid = {
-        "bernoulli__alpha": np.arange(0.1,1.01, 0.1),
+        "bernoulli__alpha": np.arange(0.1, 1.01, 1),
     }
 
     # Defina una instancia de GridSearchCV con el pipeline y el diccionario de
@@ -180,7 +178,7 @@ def pregunta_05():
     )
 
     cfm_test = confusion_matrix(
-        y_true= y_test,
+        y_true=y_test,
         y_pred=gridSearchCV.predict(x_test),
     )
 
