@@ -66,7 +66,7 @@ def pregunta_02():
 
     # Retorne `X_train`, `X_test`, `y_train` y `y_test`
     return x_train, x_test, y_train, y_test
-pregunta_02()
+
 
 def pregunta_03():
     """
