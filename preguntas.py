@@ -10,7 +10,7 @@ Naive Bayes para determinar el sentimiento de un comentario.
 """
 import numpy as np
 import pandas as pd
-from sklearn.naive_bayes import BernoulliNB
+
 
 
 def pregunta_01():
@@ -53,20 +53,20 @@ def pregunta_02():
     from sklearn.model_selection import train_test_split
 
     # Cargue los datos generados en la pregunta 01.
-    x_tagged, y_tagged, x_untagged,y_untagged = pregunta_01()
+    x_tagged, y_tagged, x_untagged, y_untagged = pregunta_01()
 
     # Divida los datos de entrenamiento y prueba. La semilla del generador de números
     # aleatorios es 12345. Use el 10% de patrones para la muestra de prueba.
     x_train, x_test, y_train, y_test = train_test_split(
-        x_train,
-        y_test,
+        x_tagged,
+        y_tagged,
         test_size=0.1,
         random_state=12345
     )
 
     # Retorne `X_train`, `X_test`, `y_train` y `y_test`
     return x_train, x_test, y_train, y_test
-
+pregunta_02()
 
 def pregunta_03():
     """
@@ -108,20 +108,22 @@ def pregunta_04():
     x_train, x_test, y_train, y_test = pregunta_02()
 
     # Obtenga el analizador de la pregunta 3.
-    analyzer2 = pregunta_03()
+    analyzer = pregunta_03()
 
     # Cree una instancia de CountVectorizer que use el analizador de palabras
     # de la pregunta 3. Esta instancia debe retornar una matriz binaria. El
     # límite superior para la frecuencia de palabras es del 100% y un límite
     # inferior de 5 palabras. Solo deben analizarse palabras conformadas por
     # letras.
-    countVectorizer = CountVectorizer(analyzer=analyzer2,lowercase=True,stop_words="english",
+    countVectorizer = CountVectorizer(analyzer=analyzer,lowercase=True,stop_words="english",
     token_pattern=r"(?u)\b[a-zA-Z][a-zA-Z]+\b", binary=True, max_df=1.0, min_df=5)
 
     # Cree un pipeline que contenga el CountVectorizer y el modelo de BernoulliNB.
     pipeline = Pipeline(steps=[
         ("countVectorizer", countVectorizer),
-        ("bernoulli", BernoulliNB()),],)
+        ("bernoulli", BernoulliNB()),
+        ],
+    )
 
     # Defina un diccionario de parámetros para el GridSearchCV. Se deben
     # considerar 10 valores entre 0.1 y 1.0 para el parámetro alpha de
@@ -159,17 +161,17 @@ def pregunta_05():
     gridSearchCV = pregunta_04()
 
     # Cargue las variables.
-    X_train, X_test, y_train, y_test = pregunta_02()
+    x_train, x_test, y_train, y_test = pregunta_02()
 
     # Evalúe el pipeline con los datos de entrenamiento usando la matriz de confusion.
     cfm_train = confusion_matrix(
         y_true=y_train,
-        y_pred=gridSearchCV.predict(X_train),
+        y_pred=gridSearchCV.predict(x_train),
     )
 
     cfm_test = confusion_matrix(
         y_true= y_test,
-        y_pred=gridSearchCV.predict(X_test),
+        y_pred=gridSearchCV.predict(x_test),
     )
 
     # Retorne la matriz de confusion de entrenamiento y prueba
